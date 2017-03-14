@@ -1,5 +1,2 @@
 # Portal
-Game for web games development
-
-Podriem fer una còpia, o algo semblant al primer lliurament aquí, amb el que ens agradaria implementar i tal
-estic fent proves i eso XD
+Collage project of a JavaScript version of a well known game named 'Portal' from Valve. We do not own any of the ideas that appear in this project (don't sue us please).
