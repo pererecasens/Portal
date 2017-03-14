@@ -1,0 +1,119 @@
+<html>
+	<head>
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.min.js"></script>
+		<script src="js/ColladaLoader.js"></script>
+		<script src="js/OrbitControls.js"></script>
+		<script>
+			// Scene and initial camera
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+			
+			// Set initial camera position
+			camera.position.z = 6;
+			camera.position.x = 3;
+			camera.position.y = 2;
+			
+			camera.rotation.y = THREE.Math.degToRad( 25 );
+			camera.rotation.x = THREE.Math.degToRad( 15 )*-1;
+
+			var controls = new THREE.OrbitControls(camera);
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+			
+			// array of functions for the rendering loop
+			var onRenderFcts= [];
+			
+			// Handle window resize
+			window.addEventListener('resize', function(){
+				renderer.setSize( window.innerWidth, window.innerHeight )
+				camera.aspect	= window.innerWidth / window.innerHeight
+				camera.updateProjectionMatrix()		
+			}, false)
+
+			// Room attributes
+			var geometryFloor = new THREE.PlaneGeometry( 5, 3.5 );
+			var materialFloor = new THREE.MeshLambertMaterial( { color: 0xd3d3d3, side: THREE.DoubleSide } );
+			var geometryRoof = new THREE.PlaneGeometry( 5, 3.5 );
+			var materialRoof = new THREE.MeshLambertMaterial( { color: 0xd3d3d3, side: THREE.DoubleSide } );
+			var geometryBack = new THREE.PlaneGeometry( 5, 3.5 );
+			var materialBack = new THREE.MeshLambertMaterial( { color: 0x77B299, side: THREE.DoubleSide } );
+			var geometrySides = new THREE.PlaneGeometry( 3.5, 3.5 );
+			var materialSides = new THREE.MeshLambertMaterial( { color: 0x893F45, side: THREE.DoubleSide } );
+			
+			// Floor
+			var floor = new THREE.Mesh( geometryFloor, materialFloor );
+			floor.position.y = -1.75;
+			floor.rotation.x = THREE.Math.degToRad( 90 );
+			scene.add( floor );
+			
+			// Roof
+			var roof = new THREE.Mesh( geometryRoof, materialRoof );
+			roof.position.y = 1.75;
+			roof.rotation.x = THREE.Math.degToRad( 90 );
+			scene.add( roof );
+			
+			// Back panel
+			var back = new THREE.Mesh( geometryBack, materialBack );
+			back.position.z = -1.75;
+			scene.add( back );
+			
+			// Side panels
+			var side1 = new THREE.Mesh( geometrySides, materialSides );
+			var side2 = new THREE.Mesh( geometrySides, materialSides );
+			side1.rotation.y = THREE.Math.degToRad( 90 );
+			side2.rotation.y = THREE.Math.degToRad( 90 );
+			side1.position.x = 2.5;
+			side2.position.x = -2.5;
+			scene.add( side1 );
+			scene.add( side2 );
+			
+			// Light1
+			var pointLight1 = new THREE.PointLight( 0xFFFFFF, 0.6 ); 
+			pointLight1.position.x = 0; 
+			pointLight1.position.y = 0; 
+			pointLight1.position.z = -0.4; 
+			scene.add(pointLight1);
+			
+			// Light2
+			var pointLight2 = new THREE.PointLight( 0xFFFFFF ); 
+			pointLight2.position.x = 5; 
+			pointLight2.position.y = 5; 
+			pointLight2.position.z = -3; 
+			scene.add(pointLight2);
+			
+			// Light3
+			var pointLight3 = new THREE.PointLight( 0xFFFFFF ); 
+			pointLight3.position.x = -5; 
+			pointLight3.position.y = -3; 
+			pointLight3.position.z = -3; 
+			scene.add(pointLight3);
+			
+			onRenderFcts.push(function(){
+				renderer.render( scene, camera );		
+			})
+			
+			// run the rendering loop
+			var lastTimeMsec= null
+			requestAnimationFrame(function animate(nowMsec){
+				// keep looping
+				requestAnimationFrame( animate );
+				// measure time
+				lastTimeMsec = lastTimeMsec || nowMsec-1000/60
+				var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
+				lastTimeMsec = nowMsec
+				// call each update function
+				onRenderFcts.forEach(function(onRenderFct){
+					onRenderFct(deltaMsec/1000, nowMsec/1000)
+				})
+			})
+		</script>
+	</body>
+</html>

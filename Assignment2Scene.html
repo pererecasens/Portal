@@ -1,0 +1,96 @@
+<html>
+	<head>
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.min.js"></script>
+		<script src="js/ColladaLoader.js"></script>
+		<script src="js/OrbitControls.js"></script>
+		<script>
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
+			
+			// Set initial camera position
+			camera.position.z = 25;
+			
+			var controls = new THREE.OrbitControls(camera);
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+			
+			// Array of functions for the rendering loop
+			var onRenderFcts= [];
+			
+			// Handle window resize
+			window.addEventListener('resize', function(){
+				renderer.setSize( window.innerWidth, window.innerHeight )
+				camera.aspect = window.innerWidth / window.innerHeight
+				camera.updateProjectionMatrix()		
+			}, false)
+			
+			// PointLight 1
+			var pointLight1 = new THREE.PointLight( 0xFFFFFF, 1, 100 ); 
+			pointLight1.position.x = -5; 
+			pointLight1.position.y = -5; 
+			pointLight1.position.z = 8; 
+			scene.add(pointLight1);
+			
+			// PointLight 2
+			var pointLight2 = new THREE.PointLight( 0xFFFFFF, 1, 100 ); 
+			pointLight2.position.x = 40; 
+			pointLight2.position.y = -5; 
+			pointLight2.position.z = 8; 
+			scene.add(pointLight2);
+			
+			// PointLight 3
+			var pointLight3 = new THREE.PointLight( 0xFFFFFF, 1, 100 ); 
+			pointLight3.position.x = 40; 
+			pointLight3.position.y = 30; 
+			pointLight3.position.z = 8; 
+			scene.add(pointLight3);
+			
+			// PointLight 4
+			var pointLight4 = new THREE.PointLight( 0xFFFFFF, 1, 100 ); 
+			pointLight4.position.x = -5; 
+			pointLight4.position.y = 30; 
+			pointLight4.position.z = 8; 
+			scene.add(pointLight4);
+			
+			// PointLight 5
+			var pointLight5 = new THREE.PointLight( 0xFFFFFF, 1, 100 ); 
+			pointLight5.position.x = 15; 
+			pointLight5.position.y = 15; 
+			pointLight5.position.z = -5;
+			scene.add(pointLight5);
+			
+			var loader = new THREE.ColladaLoader();
+			loader.load("levelDraft.dae", function (result) {
+				// result.scene.rotation.x = THREE.Math.degToRad( 90 );    no concorda amb la llum
+				scene.add(result.scene);
+			});
+			
+			onRenderFcts.push(function(){
+				renderer.render( scene, camera );		
+			})
+			
+			var lastTimeMsec= null
+			requestAnimationFrame(function animate(nowMsec){
+				// keep looping
+				requestAnimationFrame( animate );
+				// measure time
+				lastTimeMsec = lastTimeMsec || nowMsec-1000/60
+				var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
+				lastTimeMsec = nowMsec
+				// call each update function
+				onRenderFcts.forEach(function(onRenderFct){
+					onRenderFct(deltaMsec/1000, nowMsec/1000)
+				})
+			})
+			
+		</script>
+	</body>
+</html>
