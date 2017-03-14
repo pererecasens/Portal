@@ -22,9 +22,6 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
 			
-			// Array of functions for the rendering loop
-			var onRenderFcts= [];
-			
 			// Handle window resize
 			window.addEventListener('resize', function(){
 				renderer.setSize( window.innerWidth, window.innerHeight )
@@ -32,63 +29,81 @@
 				camera.updateProjectionMatrix()		
 			}, false)
 			
-			// PointLight 1
-			var pointLight1 = new THREE.PointLight( 0xFFFFFF, 1, 100 ); 
+			// PointLight 1 BottomLeft
+			var pointLight1 = new THREE.PointLight( 0xFFFFFF, 1, 50 ); 
 			pointLight1.position.x = -5; 
 			pointLight1.position.y = -5; 
 			pointLight1.position.z = 8; 
 			scene.add(pointLight1);
 			
-			// PointLight 2
-			var pointLight2 = new THREE.PointLight( 0xFFFFFF, 1, 100 ); 
+			// PointLight 2 BottomRight
+			var pointLight2 = new THREE.PointLight( 0xFFFFFF, 1, 50 ); 
 			pointLight2.position.x = 40; 
 			pointLight2.position.y = -5; 
 			pointLight2.position.z = 8; 
 			scene.add(pointLight2);
 			
-			// PointLight 3
-			var pointLight3 = new THREE.PointLight( 0xFFFFFF, 1, 100 ); 
+			// PointLight 3 UpperRight
+			var pointLight3 = new THREE.PointLight( 0xFFFFFF, 1, 50 ); 
 			pointLight3.position.x = 40; 
 			pointLight3.position.y = 30; 
 			pointLight3.position.z = 8; 
-			scene.add(pointLight3);
+			//scene.add(pointLight3);
 			
-			// PointLight 4
-			var pointLight4 = new THREE.PointLight( 0xFFFFFF, 1, 100 ); 
+			// PointLight 4 UpperLeft
+			var pointLight4 = new THREE.PointLight( 0xFFFFFF, 1, 50 ); 
 			pointLight4.position.x = -5; 
 			pointLight4.position.y = 30; 
 			pointLight4.position.z = 8; 
 			scene.add(pointLight4);
 			
-			// PointLight 5
+			// PointLight 5 UnderFloor
 			var pointLight5 = new THREE.PointLight( 0xFFFFFF, 1, 100 ); 
 			pointLight5.position.x = 15; 
 			pointLight5.position.y = 15; 
 			pointLight5.position.z = -5;
 			scene.add(pointLight5);
 			
+			// NOT WORKING AND ONLY GOD KNOWS WHY
+			// var textureLoader = new THREE.TextureLoader();
+			// var textureCube = textureLoader.load( 'models/companionCubeFace.png' );
+			
+			// Creates companionCube texture
+			var textureCube = new THREE.TextureLoader().load( 'models/companionCubeFace.png' );
+			
+			// CompanionCube
+			var geometry = new THREE.BoxGeometry( 1.5, 1.5, 1.5 );
+			var material = new THREE.MeshBasicMaterial({ map:textureCube });
+			var companionCube = new THREE.Mesh( geometry, material );
+			companionCube.position.x = 23.5;
+			companionCube.position.y = 9;
+			companionCube.position.z = 3;
+			scene.add( companionCube );
+			
+			// Init collada loader
 			var loader = new THREE.ColladaLoader();
-			loader.load("levelDraft.dae", function (result) {
-				// result.scene.rotation.x = THREE.Math.degToRad( 90 );    no concorda amb la llum
-				scene.add(result.scene);
+			
+			// Load scene
+			loader.load("models/levelDraft.dae", function (resultRoom) {
+				scene.add(resultRoom.scene);
 			});
 			
-			onRenderFcts.push(function(){
-				renderer.render( scene, camera );		
-			})
+			// Load main character
+			loader.load("models/chell.dae", function (resultChell) {
+				resultChell.scene.rotation.z = THREE.Math.degToRad( 90 );
+				resultChell.scene.rotation.y = THREE.Math.degToRad( -3 );
+				
+				resultChell.scene.position.x = 6.5;
+				resultChell.scene.position.y = 20.5;
+				resultChell.scene.position.z = 3.35;
+				
+				scene.add(resultChell.scene);
+			});
 			
-			var lastTimeMsec= null
-			requestAnimationFrame(function animate(nowMsec){
+			requestAnimationFrame(function animate(){
 				// keep looping
 				requestAnimationFrame( animate );
-				// measure time
-				lastTimeMsec = lastTimeMsec || nowMsec-1000/60
-				var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
-				lastTimeMsec = nowMsec
-				// call each update function
-				onRenderFcts.forEach(function(onRenderFct){
-					onRenderFct(deltaMsec/1000, nowMsec/1000)
-				})
+				renderer.render( scene, camera );
 			})
 			
 		</script>
